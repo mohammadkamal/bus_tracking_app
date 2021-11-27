@@ -1,3 +1,5 @@
+import 'package:bus_tracking_app/repositories/bus_trips_repository.dart';
+import 'package:bus_tracking_app/repositories/bus_trips_repository_implementation.dart';
 import 'package:bus_tracking_app/repositories/google_maps_repository.dart';
 import 'package:bus_tracking_app/repositories/google_maps_repository_implementation.dart';
 
@@ -12,5 +14,9 @@ class Injector {
 
   GoogleMapsRepository get googleMapsRepository {
     return GoogleMapsRepositoryImplementation();
+  }
+
+  BusTripsRepository get busTripsRepository {
+    return BusTripsRepositoryImplementation();
   }
 }
