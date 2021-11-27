@@ -155,6 +155,8 @@ class _SavedRouteItem extends StatelessWidget {
               builder: (context) => MapPageView(
                     startLocation: liveBusTrip!.startLocation,
                     endLocation: liveBusTrip!.endLocation,
+                    startPlaceId: liveBusTrip!.startPlaceId,
+                    endPlaceId: liveBusTrip!.endPlaceId,
                   )));
         },
         child: Container(
