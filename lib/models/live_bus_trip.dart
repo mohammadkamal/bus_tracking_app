@@ -74,9 +74,9 @@ class LiveBusTrip {
         startLocation: map['startLocation'] == null
             ? null
             : LocationCoordinates.fromMap(map['startLocation']),
-        endLocation: map['locationCoordinates'] == null
+        endLocation: map['endLocation'] == null
             ? null
-            : LocationCoordinates.fromMap(map['locationCoordinates']),
+            : LocationCoordinates.fromMap(map['endLocation']),
         startPlaceId: map['startPlaceId'],
         endPlaceId: map['endPlaceId'],
         startPlaceName: map['startPlaceName'],

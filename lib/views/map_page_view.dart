@@ -17,6 +17,26 @@ class MapPageView extends StatefulWidget {
 
 class _MapPageViewState extends State<MapPageView> {
   final Completer<GoogleMapController> _controller = Completer();
+  final Set<Marker> markers = {};
+  final List<LatLng> points = [];
+
+  @override
+  void initState() {
+    markers.add(Marker(
+        position:
+            LatLng(widget.startLocation!.lat!, widget.startLocation!.lng!),
+        markerId: MarkerId(
+            '(${widget.startLocation!.lat!}, ${widget.startLocation!.lng!})')));
+
+    markers.add(Marker(
+        position: LatLng(widget.endLocation!.lat!, widget.endLocation!.lng!),
+        markerId: MarkerId(
+            '(${widget.endLocation!.lat!}, ${widget.endLocation!.lng!})')));
+
+    points.add(LatLng(widget.startLocation!.lat!, widget.startLocation!.lng!));
+    points.add(LatLng(widget.endLocation!.lat!, widget.endLocation!.lng!));
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,10 +45,12 @@ class _MapPageViewState extends State<MapPageView> {
       body: GoogleMap(
         mapType: MapType.normal,
         initialCameraPosition: CameraPosition(
-          target: LatLng(widget.startLocation!.lat!,
-              widget.startLocation!.lng!),
+          target:
+              LatLng(widget.startLocation!.lat!, widget.startLocation!.lng!),
           zoom: 14.4746,
         ),
+        markers: markers,
+        polylines: {Polyline(points: points, polylineId: PolylineId('p'))},
         onMapCreated: (controller) {
           _controller.complete(controller);
         },
