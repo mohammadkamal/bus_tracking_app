@@ -1,5 +1,5 @@
-import 'package:bus_tracking_app/models/place_prediction.dart';
 import 'package:bus_tracking_app/presenters/planner_tab_presenter.dart';
+import 'package:bus_tracking_app/views/map_page_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -47,12 +47,14 @@ class _SourceDestinationFormState extends State<_SourceDestinationForm> {
         decoration: BoxDecoration(
             border: Border.all(color: Colors.grey, width: 2),
             borderRadius: BorderRadius.circular(12)),
-        child: Row(children: [
+        child:
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Column(
             children: [
               SizedBox(
                 width: MediaQuery.of(context).size.width * 0.75,
                 child: TextFormField(
+                  controller: _plannerTabPresenter.sourceTextController,
                   onChanged: (text) {},
                   decoration: const InputDecoration(
                     prefixIcon: Icon(Icons.my_location),
@@ -60,46 +62,58 @@ class _SourceDestinationFormState extends State<_SourceDestinationForm> {
                 ),
               ),
               SizedBox(
-                width: MediaQuery.of(context).size.width * 0.75,
-                child: InputDecorator(
-                    decoration: const InputDecoration(
-                        prefixIcon: Icon(Icons.near_me_outlined),
-                        hintText: 'Destination'),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<PlacePrediction>(
-                        onChanged: (newVal){},
-                        value: _plannerTabPresenter
-                            .placePredictionsDestination.first,
-                        items: _plannerTabPresenter.placePredictionsDestination
-                            .map((e) => DropdownMenuItem<PlacePrediction>(
-                                  child: SizedBox(
-                                    child: Text(
-                                      e.description!,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    width: MediaQuery.of(context).size.width *
-                                        0.55,
-                                  ),
-                                  value: e,
-                                ))
-                            .toList(),
-                      ),
-                    )),
-              )
-              /*
-              SizedBox(
                   width: MediaQuery.of(context).size.width * 0.75,
                   child: TextFormField(
-                    onFieldSubmitted: (entry) =>
-                        _plannerTabPresenter.fetchPlacePredictionsDestination(entry),
+                    controller: _plannerTabPresenter.destinationTextController,
+                    onFieldSubmitted: (entry) => _plannerTabPresenter
+                        .fetchPlacePredictionsDestination(entry,
+                            onComplete: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => const MapPageView()));
+                    }),
                     textInputAction: TextInputAction.search,
                     decoration: const InputDecoration(
                         prefixIcon: Icon(Icons.near_me_outlined)),
-                  ))*/
+                  ))
             ],
           ),
           const IconButton(
               onPressed: null, icon: Icon(CupertinoIcons.arrow_2_squarepath))
         ]));
+  }
+}
+
+class _PlacePredictionsDropDown extends StatefulWidget {
+  @override
+  _PlacePredictionsDropDownState createState() =>
+      _PlacePredictionsDropDownState();
+}
+
+class _PlacePredictionsDropDownState extends State<_PlacePredictionsDropDown> {
+  final PlannerTabPresenter _plannerTabPresenter;
+
+  _PlacePredictionsDropDownState()
+      : _plannerTabPresenter = PlannerTabPresenter();
+
+  @override
+  void initState() {
+    _plannerTabPresenter.addListener(() {});
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: MediaQuery.of(context).size.width * 0.75,
+      height: MediaQuery.of(context).size.width * 0.5,
+      child: ListView.builder(
+        itemCount: _plannerTabPresenter.placePredictionsDestination.length,
+        itemBuilder: (_, index) => Text(
+          _plannerTabPresenter.placePredictionsDestination[index].description!,
+          overflow: TextOverflow.ellipsis,
+        ),
+        shrinkWrap: true,
+      ),
+    );
   }
 }

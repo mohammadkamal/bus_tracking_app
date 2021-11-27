@@ -3,9 +3,6 @@ import 'package:bus_tracking_app/views/planner_tab_view.dart';
 import 'package:flutter/foundation.dart';
 
 class HomePresenter extends ChangeNotifier {
-  HomePresenter() {
-    print('initialized');
-  }
   int currentTabIndex = 0;
 
   final homeTabs = [

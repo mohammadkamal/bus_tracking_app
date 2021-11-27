@@ -42,12 +42,12 @@ class PlacePrediction {
   Map<String, dynamic> toMap() {
     return {
       'description': description,
-      'matchedSubstrings': matchedSubstrings != null
+      'matched_substrings': matchedSubstrings != null
           ? matchedSubstrings!.map((e) => e.toMap()).toList()
           : null,
-      'placeId': placeId,
+      'place_id': placeId,
       'reference': reference,
-      'structuredFormatting':
+      'structured_formatting':
           structuredFormatting != null ? structuredFormatting!.toMap() : null,
       'terms': terms != null ? terms!.map((e) => e.toMap()).toList() : null,
       'types': types != null
@@ -59,14 +59,14 @@ class PlacePrediction {
   factory PlacePrediction.fromMap(Map<String, dynamic> map) {
     return PlacePrediction(
         description: map['description'],
-        matchedSubstrings: map['matchedSubstrings'] != null
-            ? List<MatchedSubstring>.from(map['matchedSubstrings']
+        matchedSubstrings: map['matched_substrings'] != null
+            ? List<MatchedSubstring>.from(map['matched_substrings']
                 .map((e) => MatchedSubstring.fromMap(e)))
             : <MatchedSubstring>[],
-        placeId: map['placeId'],
+        placeId: map['place_id'],
         reference: map['reference'],
-        structuredFormatting: map['structuredFormatting'] != null
-            ? StructuredFormatting.fromMap(map['structuredFormatting'])
+        structuredFormatting: map['structured_formatting'] != null
+            ? StructuredFormatting.fromMap(map['structured_formatting'])
             : null,
         terms: map['terms'] != null
             ? List<Term>.from(map['terms'].map((e) => Term.fromMap(e)))
@@ -125,21 +125,22 @@ class StructuredFormatting {
 
   Map<String, dynamic> toMap() {
     return {
-      'mainText': mainText,
-      'mainTextMatchedSubstrings': mainTextMatchedSubstrings != null
+      'main_text': mainText,
+      'main_text_matched_substrings': mainTextMatchedSubstrings != null
           ? mainTextMatchedSubstrings!.map((e) => e.toMap()).toList()
           : null,
-      'secondaryText': secondaryText
+      'secondary_text': secondaryText
     }..removeWhere((key, value) => value == null);
   }
 
   factory StructuredFormatting.fromMap(Map<String, dynamic> map) {
     return StructuredFormatting(
-        mainText: map['mainText'],
-        mainTextMatchedSubstrings: map['mainTextMatchedSubstrings'] != null
-            ? List<MatchedSubstring>.from(map['mainTextMatchedSubstrings']
+        mainText: map['main_text'],
+        mainTextMatchedSubstrings: map['main_text_matched_substrings'] != null
+            ? List<MatchedSubstring>.from(map['main_text_matched_substrings']
                 .map((e) => MatchedSubstring.fromMap(e)))
-            : <MatchedSubstring>[]);
+            : <MatchedSubstring>[],
+        secondaryText: map['secondary_text']);
   }
 
   String toJson() => json.encode(toMap());
