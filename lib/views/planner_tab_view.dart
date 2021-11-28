@@ -210,10 +210,7 @@ class _SavedRouteItem extends StatelessWidget {
         onTap: () {
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => MapPageView(
-                    startLocation: liveBusTrip!.startLocation,
-                    endLocation: liveBusTrip!.endLocation,
-                    startPlaceId: liveBusTrip!.startPlaceId,
-                    endPlaceId: liveBusTrip!.endPlaceId,
+                    liveBusTrip: liveBusTrip,
                   )));
         },
         child: Container(
