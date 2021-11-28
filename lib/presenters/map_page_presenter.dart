@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:bus_tracking_app/di/injector.dart';
 import 'package:bus_tracking_app/models/location_coordinates.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class MapPagePresenter extends ChangeNotifier {
@@ -35,10 +36,14 @@ class MapPagePresenter extends ChangeNotifier {
     _di.busTripsRepository
         .fetchPolylineRoute(startPlaceId, endPlaceId)
         .listen((event) {
-      polylines.add(Polyline(points: [
-        LatLng(event.startLocation!.lat!, event.startLocation!.lng!),
-        LatLng(event.endLocation!.lat!, event.endLocation!.lng!)
-      ], polylineId: PolylineId('p${polylineIdCounter++}')));
+      polylines.add(Polyline(
+          width: 5,
+          color: Colors.green,
+          points: [
+            LatLng(event.startLocation!.lat!, event.startLocation!.lng!),
+            LatLng(event.endLocation!.lat!, event.endLocation!.lng!)
+          ],
+          polylineId: PolylineId('p${polylineIdCounter++}')));
     }).onDone(() {
       isLoading = !isLoading;
       notifyListeners();

@@ -1,4 +1,6 @@
+import 'package:bus_tracking_app/enums/location_type.dart';
 import 'package:bus_tracking_app/models/live_bus_trip.dart';
+import 'package:bus_tracking_app/models/place_prediction.dart';
 import 'package:bus_tracking_app/presenters/planner_tab_presenter.dart';
 import 'package:bus_tracking_app/views/map_page_view.dart';
 import 'package:flutter/cupertino.dart';
@@ -50,9 +52,30 @@ class _SourceDestinationFormState extends State<_SourceDestinationForm> {
                 SizedBox(
                   width: MediaQuery.of(context).size.width * 0.75,
                   child: TextFormField(
+                    textInputAction: TextInputAction.search,
                     controller: presenter.sourceTextController,
-                    onTap: () {},
-                    onChanged: (text) {},
+                    onTap: () {
+                      presenter.sourceTextController.clear();
+                      presenter.placePredictionsSource.clear();
+                      presenter.placePredictionsSource.add(PlacePrediction(
+                          description: 'My current location',
+                          structuredFormatting: StructuredFormatting(
+                              mainText: 'My current location',
+                              secondaryText: 'My current location')));
+                    },
+                    onFieldSubmitted: (entry) {
+                      presenter.fetchPlacePredictions(
+                          entry, LocationType.source, onComplete: () {
+                        showBottomSheet(
+                            context: context,
+                            builder: (_) {
+                              return _PlacePredictionsDropDown(
+                                locationType: LocationType.source,
+                                presenter: presenter,
+                              );
+                            });
+                      });
+                    },
                     decoration: const InputDecoration(
                       prefixIcon: Icon(Icons.my_location),
                     ),
@@ -64,11 +87,21 @@ class _SourceDestinationFormState extends State<_SourceDestinationForm> {
                         width: MediaQuery.of(context).size.width * 0.75,
                         child: TextFormField(
                           controller: presenter.destinationTextController,
+                          onTap: () {
+                            presenter.placePredictionsDestination.clear();
+                          },
                           onFieldSubmitted: (entry) => presenter
-                              .fetchPlacePredictionsDestination(entry,
+                              .fetchPlacePredictions(
+                                  entry, LocationType.destination,
                                   onComplete: () {
-                            presenter.fetchLiveBusTrips(
-                                'source', 'destination');
+                            showBottomSheet(
+                                context: context,
+                                builder: (_) {
+                                  return _PlacePredictionsDropDown(
+                                    locationType: LocationType.destination,
+                                    presenter: presenter,
+                                  );
+                                });
                           }),
                           textInputAction: TextInputAction.search,
                           decoration: const InputDecoration(
@@ -78,14 +111,21 @@ class _SourceDestinationFormState extends State<_SourceDestinationForm> {
                 )
               ],
             ),
-            const IconButton(
-                onPressed: null, icon: Icon(CupertinoIcons.arrow_2_squarepath)),
+            IconButton(
+                onPressed: presenter.onSwitchTap,
+                icon: const Icon(CupertinoIcons.arrow_2_squarepath)),
           ]));
     });
   }
 }
 
 class _PlacePredictionsDropDown extends StatefulWidget {
+  final PlannerTabPresenter presenter;
+  final LocationType locationType;
+
+  const _PlacePredictionsDropDown(
+      {Key? key, required this.presenter, required this.locationType})
+      : super(key: key);
   @override
   _PlacePredictionsDropDownState createState() =>
       _PlacePredictionsDropDownState();
@@ -94,20 +134,37 @@ class _PlacePredictionsDropDown extends StatefulWidget {
 class _PlacePredictionsDropDownState extends State<_PlacePredictionsDropDown> {
   @override
   Widget build(BuildContext context) {
-    return Consumer<PlannerTabPresenter>(builder: (_, presenter, __) {
-      return SizedBox(
-        width: MediaQuery.of(context).size.width * 0.75,
-        height: MediaQuery.of(context).size.width * 0.5,
-        child: ListView.builder(
-          itemCount: presenter.placePredictionsDestination.length,
-          itemBuilder: (_, index) => Text(
-            presenter.placePredictionsDestination[index].description!,
-            overflow: TextOverflow.ellipsis,
-          ),
-          shrinkWrap: true,
-        ),
-      );
-    });
+    return ChangeNotifierProvider.value(
+      value: widget.presenter,
+      builder: (_, __) {
+        return Consumer<PlannerTabPresenter>(builder: (_, presenter, __) {
+          return Container(
+            decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey, width: 2),
+                borderRadius: BorderRadius.circular(5)),
+            child: ListView.builder(
+              itemCount: widget.locationType == LocationType.destination
+                  ? presenter.placePredictionsDestination.length
+                  : presenter.placePredictionsSource.length,
+              itemBuilder: (_, index) => InkWell(
+                onTap: () => presenter
+                    .onPredictionSelected(index, widget.locationType, then: () {
+                  Navigator.of(context).pop();
+                }),
+                child: Text(
+                  widget.locationType == LocationType.destination
+                      ? presenter
+                          .placePredictionsDestination[index].description!
+                      : presenter.placePredictionsSource[index].description!,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              shrinkWrap: true,
+            ),
+          );
+        });
+      },
+    );
   }
 }
 

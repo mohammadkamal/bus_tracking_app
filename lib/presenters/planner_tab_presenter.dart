@@ -1,4 +1,5 @@
 import 'package:bus_tracking_app/di/injector.dart';
+import 'package:bus_tracking_app/enums/location_type.dart';
 import 'package:bus_tracking_app/models/live_bus_trip.dart';
 import 'package:bus_tracking_app/models/place_prediction.dart';
 import 'package:flutter/foundation.dart';
@@ -19,18 +20,30 @@ class PlannerTabPresenter extends ChangeNotifier {
   final TextEditingController destinationTextController =
       TextEditingController();
 
-  void fetchPlacePredictionsDestination(String searchEntry,
+  void fetchPlacePredictions(String searchEntry, LocationType locationType,
       {VoidCallback? onComplete}) {
     _di.googleMapsRepository
         .fetchPlacesPredictions(searchEntry)
         .listen((prediction) {
-      placePredictionsDestination.add(prediction);
+      switch (locationType) {
+        case LocationType.source:
+          placePredictionsSource.add(prediction);
+          break;
+        case LocationType.destination:
+          placePredictionsDestination.add(prediction);
+          break;
+      }
     }).onDone(() {
-      currentDestination = placePredictionsDestination.first;
+      switch (locationType) {
+        case LocationType.source:
+          currentSource = placePredictionsSource.first;
+          break;
+        case LocationType.destination:
+          currentDestination = placePredictionsDestination.first;
+          break;
+      }
       notifyListeners();
-      fetchPlaceDetailsDestination(placePredictionsDestination.first.placeId!,
-          onComplete: onComplete!);
-      //onComplete!();
+      onComplete!();
     });
   }
 
@@ -46,5 +59,38 @@ class PlannerTabPresenter extends ChangeNotifier {
     _di.busTripsRepository.fetchLiveBusTrips().listen((liveBusTrip) {
       savedRoutes.add(liveBusTrip);
     }).onDone(notifyListeners);
+  }
+
+  void onPredictionSelected(int index, LocationType locationType,
+      {VoidCallback? then}) {
+    switch (locationType) {
+      case LocationType.source:
+        currentSource = placePredictionsSource.elementAt(index);
+        sourceTextController.text =
+            currentSource!.structuredFormatting!.mainText!;
+        break;
+      case LocationType.destination:
+        currentDestination = placePredictionsDestination.elementAt(index);
+        destinationTextController.text =
+            currentDestination!.structuredFormatting!.mainText!;
+        break;
+    }
+    if (currentDestination != null && currentSource != null) {
+      savedRoutes.clear();
+      fetchLiveBusTrips(currentSource!.structuredFormatting!.mainText!,
+          currentDestination!.structuredFormatting!.mainText!);
+    }
+    then!();
+  }
+
+  void onSwitchTap() {
+    String tempText = sourceTextController.text;
+    sourceTextController.text = destinationTextController.text;
+    destinationTextController.text = tempText;
+
+    PlacePrediction? tempPrediction =
+        currentSource == null ? currentSource : null;
+    currentSource = currentDestination;
+    currentDestination = tempPrediction;
   }
 }

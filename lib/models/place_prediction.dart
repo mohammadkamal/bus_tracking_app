@@ -71,10 +71,10 @@ class PlacePrediction {
         terms: map['terms'] != null
             ? List<Term>.from(map['terms'].map((e) => Term.fromMap(e)))
             : <Term>[],
-        types: map['types'] != null
+        /*types: map['types'] != null
             ? List<PlacePredictionType>.from(map['types'].map((e) =>
                 EnumString.convertFromString(PlacePredictionType.values, e)))
-            : <PlacePredictionType>[]);
+            : <PlacePredictionType>[]*/);
   }
 }
 
